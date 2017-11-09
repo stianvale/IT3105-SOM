@@ -7,10 +7,14 @@ def import_from_file(txtfile):
 		line_list = line_list[5:]
 
 		for line in line_list:
+			line = line.strip()
 			line_split = line.split(" ")
-			coords.append(line_split[1:])
+			if(len(line_split) == 1):
+				break
+			coords.append([float(x) for x in line_split[1:]])
 
 	return coords
 
 
 print(import_from_file("1.txt"))
+
