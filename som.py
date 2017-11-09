@@ -115,7 +115,7 @@ class SOM(object):
 
 				
 
-som = SOM(txtfile = "1.txt", lrate = 0.7, tauLearn = 10000, tauTop = 10000 , toprate = 4.2)
+som = SOM(txtfile = "1.txt", lrate = 0.7, tauLearn = 100000, tauTop = 10000 , toprate = 40)
 som.train_network(1000)
 #som.plotProgression()
 
