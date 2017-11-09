@@ -90,15 +90,15 @@ class SOM(object):
 
 	def plotResults(self):
 		a = plt.figure(1)
-		plt.plot([x[0] for x in self.inputs], [x[1] for x in self.inputs], 'ro')
-		plt.plot([x[0] for x in self.outputs], [x[1] for x in self.outputs], '--bo')
+		plt.plot([x[0] for x in self.outputs] + [self.outputs[0][0]], [x[1] for x in self.outputs] + [self.outputs[0][1]], '--bo')
+		plt.plot([x[0] for x in self.inputs], [x[1] for x in self.inputs], 'rx')
 		plt.show()
 
 
 
 				
 
-som = SOM(txtfile = "1.txt", lrate = 0.5, tauLearn = 10000, tauTop = 10000 , toprate = 10 )
+som = SOM(txtfile = "1.txt", lrate = 0.5, tauLearn = 10000, tauTop = 10000 , toprate = 3)
 som.train_network(2500)
 som.plotResults()
 
