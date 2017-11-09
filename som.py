@@ -1,5 +1,6 @@
 import sys
 import random
+import math
 
 class SOM(object):
 
@@ -9,6 +10,9 @@ class SOM(object):
 		self.outputs = None
 		self.numCities = None
 		self.lrate = None
+		self.tau = None
+		self.toprate = None
+		self.T = None
 		self.minX = None
 		self.maxX = None
 		self.minY = None
@@ -63,6 +67,18 @@ class SOM(object):
 					if(distance < winning_distance):
 						winning_distance = distance
 						winning_node = j
+
+				for j, outpt in enumerate(self.outputs):
+					top_dist = math.abs(winning_node-j)
+					if(top_dist > len(self.inputs)/2):
+						top_dist = len(self.inputs) - top_dist
+					top_val = math.exp(((top_dist)**2)/self.toprate**2)
+
+					outpt[0] = outpt[0] + self.lrate * top_val * (self.inputs[j][0] - outpt[0])
+					outpt[1] = outpt[1] + self.lrate * top_val * (self.inputs[j][1] - outpt[1])
+
+			self.toprate = self.toprate * math.exp(-epoch/self.T)
+			self.lrate = self.lrate * math.exp(-epoch/self.tau)
 
 				
 
