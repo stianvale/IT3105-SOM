@@ -1,14 +1,20 @@
-
+import sys
+import random
 
 class SOM(object):
 
-	def __init__(self, txtfile, lrate):
+	def __init__(self, txtfile):
 		
 		self.inputs = self.import_from_file(txtfile)
 		self.outputs = None
-		self.lrate = lrate
+		self.numCities = None
+		self.lrate = None
+		self.minX = None
+		self.maxX = None
+		self.minY = None
+		self.maxY = None
 
-		print(self.inputs)
+		self.createOutputLayer()
 	
 
 	def import_from_file(self, txtfile):
@@ -28,8 +34,19 @@ class SOM(object):
 
 		return coords
 
-	def createOutputLayer():
+	def createOutputLayer(self):
 
+		xList = [x[0] for x in self.inputs]
+		yList = [y[1] for y in self.inputs]
+
+		self.minX = min(xList)
+		self.maxX = max(xList)
+		self.minY = min(yList)
+		self.maxY = max(yList)
+
+		self.numCities = len(self.inputs)
+
+		self.outputs = [[random.randint(self.minX,self.maxX), random.randint(self.minY, self.maxY)] for x in range(0,self.numCities)]
 
 
 	def train_network(self, epochs):
