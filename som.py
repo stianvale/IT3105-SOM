@@ -3,6 +3,7 @@ import random
 import math
 import numpy as np
 import matplotlib.pyplot as plt
+import time
 
 class SOM(object):
 
@@ -21,6 +22,9 @@ class SOM(object):
 		self.maxY = None
 
 		self.createOutputLayer()
+		print(self.outputs)
+		self.outputsPlots = [self.outputs[:]]
+		print(self.outputsPlots)
 	
 
 	def import_from_file(self, txtfile):
@@ -56,10 +60,12 @@ class SOM(object):
 
 
 	def train_network(self, epochs):
+		#self.plotResults()
 		for epoch in range(epochs):
 			print(epoch)
-			#if(epoch + 1 % 100 == 0):
-				#self.plotResults()
+			if((epoch) % 100 == 0):
+				self.plotMap()
+
 			for i, inpt in enumerate(self.inputs):
 				winning_node = None
 				winning_distance = None
@@ -85,22 +91,30 @@ class SOM(object):
 
 			self.toprate = self.toprate * math.exp(-epoch/self.tauTop)
 			self.lrate = self.lrate * math.exp(-epoch/self.tauLearn)
+
 		print(self.inputs)
 		print(self.outputs)
 
 	def plotResults(self):
-		a = plt.figure(1)
-		plt.plot([x[0] for x in self.outputs] + [self.outputs[0][0]], [x[1] for x in self.outputs] + [self.outputs[0][1]], '--bo')
-		plt.plot([x[0] for x in self.inputs], [x[1] for x in self.inputs], 'rx')
+		p1 = plt.plot([x[0] for x in self.outputs] + [self.outputs[0][0]], [x[1] for x in self.outputs] + [self.outputs[0][1]], '--bo')
+		p2 = plt.plot([x[0] for x in self.inputs], [x[1] for x in self.inputs], 'rx')
 		plt.show()
+
+
+	def plotMap(self):
+		plt.clf()
+		p1 = plt.plot([x[0] for x in self.outputs] + [self.outputs[0][0]], [x[1] for x in self.outputs] + [self.outputs[0][1]], '--bo')
+		p2 = plt.plot([x[0] for x in self.inputs], [x[1] for x in self.inputs], 'rx')
+		plt.draw()
+		plt.pause(0.1)
 
 
 
 				
 
-som = SOM(txtfile = "1.txt", lrate = 0.5, tauLearn = 10000, tauTop = 10000 , toprate = 3)
-som.train_network(2500)
-som.plotResults()
+som = SOM(txtfile = "1.txt", lrate = 0.7, tauLearn = 10000, tauTop = 10000 , toprate = 10)
+som.train_network(1000)
+#som.plotProgression()
 
 
 
