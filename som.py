@@ -1,18 +1,20 @@
 import sys
 import random
 import math
+import numpy as np
+import matplotlib.pyplot as plt
 
 class SOM(object):
 
-	def __init__(self, txtfile):
+	def __init__(self, txtfile, lrate, tauLearn, tauTop, toprate):
 		
 		self.inputs = self.import_from_file(txtfile)
 		self.outputs = None
 		self.numCities = None
-		self.lrate = None
-		self.tau = None
-		self.toprate = None
-		self.T = None
+		self.lrate = lrate
+		self.tauLearn = tauLearn
+		self.toprate = toprate
+		self.tauTop = tauTop
 		self.minX = None
 		self.maxX = None
 		self.minY = None
@@ -55,6 +57,7 @@ class SOM(object):
 
 	def train_network(self, epochs):
 		for epoch in range(epochs):
+			print(epoch)
 			for i, inpt in enumerate(self.inputs):
 				winning_node = None
 				winning_distance = None
@@ -69,20 +72,34 @@ class SOM(object):
 						winning_node = j
 
 				for j, outpt in enumerate(self.outputs):
-					top_dist = math.abs(winning_node-j)
+					top_dist = math.fabs(winning_node-j)
 					if(top_dist > len(self.inputs)/2):
 						top_dist = len(self.inputs) - top_dist
-					top_val = math.exp(((top_dist)**2)/self.toprate**2)
+					
+					top_val = math.exp(-((top_dist)**2)/self.toprate**2)
 
 					outpt[0] = outpt[0] + self.lrate * top_val * (self.inputs[j][0] - outpt[0])
 					outpt[1] = outpt[1] + self.lrate * top_val * (self.inputs[j][1] - outpt[1])
 
-			self.toprate = self.toprate * math.exp(-epoch/self.T)
-			self.lrate = self.lrate * math.exp(-epoch/self.tau)
+			self.toprate = self.toprate * math.exp(-epoch/self.tauTop)
+			self.lrate = self.lrate * math.exp(-epoch/self.tauLearn)
+		print(self.inputs)
+		print(self.outputs)
+
+	def plotResults(self):
+		plt.plot(np.array(self.inputs[0]), np.array(self.inputs[1]))
+		
+
+		a = input()
+
 
 				
 
 
-SOM("1.txt")
+som = SOM(txtfile = "1.txt", lrate = 0.1, tauLearn = 100, tauTop = 100 , toprate = 0.1 )
+som.train_network(250)
+som.plotResults()
+
+
 
 
