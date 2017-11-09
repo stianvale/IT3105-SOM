@@ -32,6 +32,22 @@ class SOM(object):
 
 
 
+	def train_network(self, epochs):
+		for epoch in range(epochs):
+			for i, inpt in enumerate(self.inputs):
+				winning_node = None
+				winning_distance = None
+				for j, outpt in enumerate(self.outputs):
+					if(j == 0):
+						winning_node = 0
+						winning_distance = (inpt[0] - outpt[0])**2 + (inpt[1] - outpt[1])**2
+
+					distance = (inpt[0] - outpt[0])**2 + (inpt[1] - outpt[1])**2
+					if(distance < winning_distance):
+						winning_distance = distance
+						winning_node = j
+
+				
 
 
 SOM("1.txt")
