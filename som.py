@@ -58,6 +58,8 @@ class SOM(object):
 	def train_network(self, epochs):
 		for epoch in range(epochs):
 			print(epoch)
+			#if(epoch + 1 % 100 == 0):
+				#self.plotResults()
 			for i, inpt in enumerate(self.inputs):
 				winning_node = None
 				winning_distance = None
@@ -78,8 +80,8 @@ class SOM(object):
 					
 					top_val = math.exp(-((top_dist)**2)/self.toprate**2)
 
-					outpt[0] = outpt[0] + self.lrate * top_val * (self.inputs[j][0] - outpt[0])
-					outpt[1] = outpt[1] + self.lrate * top_val * (self.inputs[j][1] - outpt[1])
+					outpt[0] = outpt[0] + self.lrate * top_val * (inpt[0] - outpt[0])
+					outpt[1] = outpt[1] + self.lrate * top_val * (inpt[1] - outpt[1])
 
 			self.toprate = self.toprate * math.exp(-epoch/self.tauTop)
 			self.lrate = self.lrate * math.exp(-epoch/self.tauLearn)
@@ -87,17 +89,17 @@ class SOM(object):
 		print(self.outputs)
 
 	def plotResults(self):
-		plt.plot(np.array(self.inputs[0]), np.array(self.inputs[1]))
-		
+		a = plt.figure(1)
+		plt.plot([x[0] for x in self.inputs], [x[1] for x in self.inputs], 'ro')
+		plt.plot([x[0] for x in self.outputs], [x[1] for x in self.outputs], '--bo')
+		plt.show()
 
-		a = input()
 
 
 				
 
-
-som = SOM(txtfile = "1.txt", lrate = 0.1, tauLearn = 100, tauTop = 100 , toprate = 0.1 )
-som.train_network(250)
+som = SOM(txtfile = "1.txt", lrate = 0.5, tauLearn = 10000, tauTop = 10000 , toprate = 10 )
+som.train_network(2500)
 som.plotResults()
 
 
