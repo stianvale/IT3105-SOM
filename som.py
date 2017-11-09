@@ -62,7 +62,7 @@ class SOM(object):
 	def train_network(self, epochs):
 		#self.plotResults()
 		for epoch in range(epochs):
-			print(epoch)
+			#print(epoch)
 			if((epoch) % 100 == 0):
 				self.plotMap()
 
@@ -107,13 +107,27 @@ class SOM(object):
 		p2 = plt.plot([x[0] for x in self.inputs], [x[1] for x in self.inputs], 'rx')
 		plt.draw()
 		plt.pause(0.1)
+		print(self.return_ring_length())
 
+	def return_ring_length(self):
+		length = 0
+		for j, outpt in enumerate(self.outputs):
+			segment_length = 0
+			if(j == 0):
+				segment_length = np.linalg.norm(np.array(self.outputs[-1]) - np.array(outpt))
+			else:
+				segment_length = np.linalg.norm(np.array(self.outputs[j-1]) - np.array(outpt))
+
+			length += segment_length
+
+		return length
 
 
 				
 
-som = SOM(txtfile = "1.txt", lrate = 0.7, tauLearn = 10000, tauTop = 10000 , toprate = 10)
-som.train_network(1000)
+som = SOM(txtfile = "1.txt", lrate = 0.7, tauLearn = 100000, tauTop = 10000 , toprate = 4.2)
+som.train_network(600)
+a = input()
 #som.plotProgression()
 
 
