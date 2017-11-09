@@ -64,7 +64,7 @@ class SOM(object):
 		for epoch in range(epochs):
 			print(epoch)
 			if((epoch) % 100 == 0):
-				self.plotMap()
+				self.plotMap(epoch)
 
 			for i, inpt in enumerate(self.inputs):
 				winning_node = None
@@ -101,10 +101,13 @@ class SOM(object):
 		plt.show()
 
 
-	def plotMap(self):
+	def plotMap(self,epoch):
 		plt.clf()
 		p1 = plt.plot([x[0] for x in self.outputs] + [self.outputs[0][0]], [x[1] for x in self.outputs] + [self.outputs[0][1]], '--bo')
 		p2 = plt.plot([x[0] for x in self.inputs], [x[1] for x in self.inputs], 'rx')
+		#plt.title('Epoch # ', epoch)
+		#plt.title('Epoch #{:06d}'.format(epoch))
+		plt.title('Epoch #%d' % epoch)
 		plt.draw()
 		plt.pause(0.1)
 
@@ -112,7 +115,7 @@ class SOM(object):
 
 				
 
-som = SOM(txtfile = "1.txt", lrate = 0.7, tauLearn = 10000, tauTop = 10000 , toprate = 10)
+som = SOM(txtfile = "1.txt", lrate = 0.7, tauLearn = 10000, tauTop = 10000 , toprate = 4.2)
 som.train_network(1000)
 #som.plotProgression()
 
