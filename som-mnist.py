@@ -5,7 +5,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 import networkx as nx
-import matplotlib.pyplot as plt
 
 class SOM(object):
 
@@ -60,7 +59,7 @@ class SOM(object):
 		#self.plotResults()
 		for epoch in range(epochs):
 			print(epoch)
-			if((epoch+1) % 100 == 0):
+			if((epoch+1) % 10 == 0):
 				#self.plotMap(epoch)
 				self.test_network()
 				self.plotGrid()
@@ -79,9 +78,13 @@ class SOM(object):
 				# 		winning_distance = distance
 				# 		winning_node = j
 
-				distances = np.array([np.linalg(inpt - outpt) for outpt in self.outputs])
+				distances = np.array([np.linalg.norm(inpt - outpt) for outpt in self.outputs])
 				winning_node = np.argmin(distances)
 
+				# top_dists = np.array([self.getTopDist(winning_node, x) for x in range(len(self.outputs))])
+				# top_vals = np.array([math.exp(-((top_dist)**2)/self.toprate**2) for top_dist in top_dists])
+				# vector_diffs = np.array([inpt - outpt for outpt in self.outputs])
+				# self.outputs = np.array([self.outputs[j] + self.lrate * top_vals[j] * vector_diffs[j] for j in range(len(self.outputs))])
 				for j, outpt in enumerate(self.outputs):
 					top_dist = self.getTopDist(winning_node,j)
 					
@@ -89,8 +92,8 @@ class SOM(object):
 
 					self.outputs[j] = outpt + self.lrate * top_val * (inpt - outpt)
 
-					#outpt[0] = outpt[0] + self.lrate * top_val * (inpt[0] - outpt[0])
-					#outpt[1] = outpt[1] + self.lrate * top_val * (inpt[1] - outpt[1])
+					outpt[0] = outpt[0] + self.lrate * top_val * (inpt[0] - outpt[0])
+					outpt[1] = outpt[1] + self.lrate * top_val * (inpt[1] - outpt[1])
 
 			self.toprate = self.toprate * math.exp(-epoch/self.tauTop)
 			self.lrate = self.lrate * math.exp(-epoch/self.tauLearn)
@@ -117,9 +120,7 @@ class SOM(object):
 			self.winners[winning_node].append(self.targets[i])
 
 		for i in range(len(self.classes)):
-			print(self.winners[i])
 			bincount = np.bincount(self.winners[i])
-			print(bincount)
 			if (len(bincount) == 0):
 				self.classes[i] = 10
 			else:
@@ -154,7 +155,6 @@ class SOM(object):
 				testlist.append([])
 			testlist[-1].append(self.classes[i])
 
-		print(np.array(testlist))
 
 
 
@@ -200,7 +200,7 @@ class SOM(object):
 
 		val_map = {
 			0: 'red', 1: 'orange', 2: 'blue', 3: 'crimson', 4: 'pink',
-			5: 'purple', 6: 'green', 7: 'black', 8: 'brown', 9: 'cyan', 10: 'grey'
+			5: 'purple', 6: 'green', 7: 'grey', 8: 'brown', 9: 'cyan', 10: 'black'
 		}
 
 		colors = [val_map[x] for x in self.classes]
@@ -216,7 +216,7 @@ class SOM(object):
 
 
 
-som = SOM(txtfile = "mnist.txt", lrate = 0.3, tauLearn = 2000, tauTop = 500 , toprate = 10)
+som = SOM(txtfile = "mnist.txt", lrate = 0.7, tauLearn = 2000, tauTop = 500 , toprate = 5)
 som.train_network(500)
 
 a = input()
