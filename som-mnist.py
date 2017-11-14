@@ -4,6 +4,8 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 import time
+import networkx as nx
+import matplotlib.pyplot as plt
 
 class SOM(object):
 
@@ -61,6 +63,7 @@ class SOM(object):
 			if((epoch+1) % 100 == 0):
 				#self.plotMap(epoch)
 				self.test_network()
+				self.plotGrid()
 
 
 			for i, inpt in enumerate(self.inputs):
@@ -154,6 +157,7 @@ class SOM(object):
 		print(np.array(testlist))
 
 
+
 		return correct
 
 
@@ -189,11 +193,30 @@ class SOM(object):
 
 		return length
 
+	def plotGrid(self):
+		N = 10
+		G=nx.grid_2d_graph(N,N)
+		pos = dict( (n, (n[1], N-1-n[0])) for n in G.nodes() )
+
+		val_map = {
+			0: 'red', 1: 'orange', 2: 'blue', 3: 'crimson', 4: 'pink',
+			5: 'purple', 6: 'green', 7: 'black', 8: 'brown', 9: 'cyan', 10: 'grey'
+		}
+
+		colors = [val_map[x] for x in self.classes]
+
+		values = dict((n,v) for n, v in list(zip(G.nodes(),self.classes)))
+
+		nx.draw_networkx(G, pos=pos, node_color = colors, labels = values)
+
+		plt.axis('off')
+		plt.show()
 
 
 
 
-som = SOM(txtfile = "mnist.txt", lrate = 0.5, tauLearn = 100000, tauTop = 10000 , toprate = 10)
+
+som = SOM(txtfile = "mnist.txt", lrate = 0.3, tauLearn = 2000, tauTop = 500 , toprate = 10)
 som.train_network(500)
 
 a = input()
