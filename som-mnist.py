@@ -64,20 +64,23 @@ class SOM(object):
 
 
 			for i, inpt in enumerate(self.inputs):
-				winning_node = None
-				winning_distance = None
-				for j, outpt in enumerate(self.outputs):
-					if(j == 0):
-						winning_node = 0
-						winning_distance = np.linalg.norm(inpt - outpt)
+				# winning_node = None
+				# winning_distance = None
+				# for j, outpt in enumerate(self.outputs):
+				# 	if(j == 0):
+				# 		winning_node = 0
+				# 		winning_distance = np.linalg.norm(inpt - outpt)
 
-					distance = np.linalg.norm(inpt - outpt)
-					if(distance < winning_distance):
-						winning_distance = distance
-						winning_node = j
+				# 	distance = np.linalg.norm(inpt - outpt)
+				# 	if(distance < winning_distance):
+				# 		winning_distance = distance
+				# 		winning_node = j
+
+				distances = np.array([np.linalg(inpt - outpt) for outpt in self.outputs])
+				winning_node = np.argmin(distances)
 
 				for j, outpt in enumerate(self.outputs):
-					top_dist = self.getTopDist(i,j)
+					top_dist = self.getTopDist(winning_node,j)
 					
 					top_val = math.exp(-((top_dist)**2)/self.toprate**2)
 
