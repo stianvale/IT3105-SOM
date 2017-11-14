@@ -37,9 +37,14 @@ class SOM(object):
 
 			for line in line_list:
 				line = line.strip()
+				if line == "EOF":
+					return coords
 				line_split = line.split(" ")
+				line_split = [x.strip() for x in line_split]
+				line_split = [x for x in line_split if x != ""]
 				if(len(line_split) == 1):
 					break
+				print(line_split)
 				coords.append([float(x) for x in line_split[1:]])
 
 		return coords
@@ -56,13 +61,13 @@ class SOM(object):
 
 		self.numCities = len(self.inputs)
 
-		self.outputs = [[random.randint(self.minX,self.maxX), random.randint(self.minY, self.maxY)] for x in range(0,self.numCities)]
+		self.outputs = [[random.uniform(self.minX,self.maxX), random.uniform(self.minY, self.maxY)] for x in range(0,300)]
 
 
 	def train_network(self, epochs):
 		#self.plotResults()
 		for epoch in range(epochs):
-			print(epoch)
+			#print(epoch)
 			if((epoch) % 100 == 0):
 				self.plotMap(epoch)
 
@@ -81,8 +86,8 @@ class SOM(object):
 
 				for j, outpt in enumerate(self.outputs):
 					top_dist = math.fabs(winning_node-j)
-					if(top_dist > len(self.inputs)/2):
-						top_dist = len(self.inputs) - top_dist
+					if(top_dist > len(self.outputs)/2):
+						top_dist = len(self.outputs) - top_dist
 					
 					top_val = math.exp(-((top_dist)**2)/self.toprate**2)
 
@@ -92,8 +97,8 @@ class SOM(object):
 			self.toprate = self.toprate * math.exp(-epoch/self.tauTop)
 			self.lrate = self.lrate * math.exp(-epoch/self.tauLearn)
 
-		print(self.inputs)
-		print(self.outputs)
+		#print(self.inputs)
+		#print(self.outputs)
 
 	def plotResults(self):
 		p1 = plt.plot([x[0] for x in self.outputs] + [self.outputs[0][0]], [x[1] for x in self.outputs] + [self.outputs[0][1]], '--bo')
@@ -110,13 +115,28 @@ class SOM(object):
 		plt.title('Epoch #%d' % epoch)
 		plt.draw()
 		plt.pause(0.1)
+		print(self.return_ring_length())
 
+	def return_ring_length(self):
+		length = 0
+		for j, outpt in enumerate(self.outputs):
+			segment_length = 0
+			if(j == 0):
+				segment_length = np.linalg.norm(np.array(self.outputs[-1]) - np.array(outpt))
+			else:
+				segment_length = np.linalg.norm(np.array(self.outputs[j-1]) - np.array(outpt))
+
+			length += segment_length
+
+		return length
 
 
 				
 
-som = SOM(txtfile = "1.txt", lrate = 0.7, tauLearn = 100000, tauTop = 10000 , toprate = 40)
-som.train_network(1000)
+som = SOM(txtfile = "8.txt", lrate = 0.5, tauLearn = 100000, tauTop = 10000 , toprate = 20)
+som.train_network(400)
+a = input()
+
 #som.plotProgression()
 
 
