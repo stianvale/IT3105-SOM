@@ -22,7 +22,6 @@ class SOM(object):
 		self.maxY = None
 
 		self.createOutputLayer()
-		#self.createOutputRing()
 		print(self.outputs)
 		self.outputsPlots = [self.outputs[:]]
 		print(self.outputsPlots)
@@ -38,12 +37,17 @@ class SOM(object):
 
 			for line in line_list:
 				line = line.strip()
+				if line == "EOF":
+					return coords
 				line_split = line.split(" ")
+				line_split = [x.strip() for x in line_split]
+				line_split = [x for x in line_split if x != ""]
 				if(len(line_split) == 1):
 					break
+				print(line_split)
 				coords.append([float(x) for x in line_split[1:]])
 
-		return np.array(coords)
+		return coords
 
 	def createOutputLayer(self):
 
@@ -57,23 +61,7 @@ class SOM(object):
 
 		self.numCities = len(self.inputs)
 
-		self.outputs = np.array([[random.uniform(self.minX,self.maxX), random.uniform(self.minY, self.maxY)] for x in range(0,300)])
-
-
-	def createOutputRing(self):
-		self.outputs = []
-
-		self.outSize = 200
-		edgeSize = int(self.outSize/4)
-
-		for i in range(edgeSize):
-			self.outputs.append([self.minX + (self.maxX-self.minX)*i/(self.outSize/4), self.minY])
-		for i in range(edgeSize):
-			self.outputs.append([self.maxX, self.minY + (self.maxY-self.minY)*i/(self.outSize/4)])
-		for i in range(edgeSize):
-			self.outputs.append([self.maxX - (self.maxX-self.minX)*i/(self.outSize/4), self.maxY])
-		for i in range(edgeSize):
-			self.outputs.append([self.minX, self.maxY - (self.maxY-self.minY)*i/(self.outSize/4)])
+		self.outputs = [[random.uniform(self.minX,self.maxX), random.uniform(self.minY, self.maxY)] for x in range(0,300)]
 
 
 	def train_network(self, epochs):
@@ -81,7 +69,7 @@ class SOM(object):
 		for epoch in range(epochs):
 			#print(epoch)
 			if((epoch) % 100 == 0):
-				self.plotMap()
+				self.plotMap(epoch)
 
 			for i, inpt in enumerate(self.inputs):
 				winning_node = None
@@ -103,16 +91,14 @@ class SOM(object):
 					
 					top_val = math.exp(-((top_dist)**2)/self.toprate**2)
 
-					self.outputs[j] = outpt + self.lrate * top_val * (inpt - outpt)
-
-					#outpt[0] = outpt[0] + self.lrate * top_val * (inpt[0] - outpt[0])
-					#outpt[1] = outpt[1] + self.lrate * top_val * (inpt[1] - outpt[1])
+					outpt[0] = outpt[0] + self.lrate * top_val * (inpt[0] - outpt[0])
+					outpt[1] = outpt[1] + self.lrate * top_val * (inpt[1] - outpt[1])
 
 			self.toprate = self.toprate * math.exp(-epoch/self.tauTop)
 			self.lrate = self.lrate * math.exp(-epoch/self.tauLearn)
 
-		print(self.inputs)
-		print(self.outputs)
+		#print(self.inputs)
+		#print(self.outputs)
 
 	def plotResults(self):
 		p1 = plt.plot([x[0] for x in self.outputs] + [self.outputs[0][0]], [x[1] for x in self.outputs] + [self.outputs[0][1]], '--bo')
@@ -120,16 +106,18 @@ class SOM(object):
 		plt.show()
 
 
-	def plotMap(self):
+	def plotMap(self,epoch):
 		plt.clf()
 		p1 = plt.plot([x[0] for x in self.outputs] + [self.outputs[0][0]], [x[1] for x in self.outputs] + [self.outputs[0][1]], '--bo')
 		p2 = plt.plot([x[0] for x in self.inputs], [x[1] for x in self.inputs], 'rx')
+		#plt.title('Epoch # ', epoch)
+		#plt.title('Epoch #{:06d}'.format(epoch))
+		plt.title('Epoch #%d' % epoch)
 		plt.draw()
 		plt.pause(0.1)
 		print(self.return_ring_length())
 
 	def return_ring_length(self):
-		print(self.outputs)
 		length = 0
 		for j, outpt in enumerate(self.outputs):
 			segment_length = 0
@@ -145,9 +133,10 @@ class SOM(object):
 
 				
 
-som = SOM(txtfile = "2.txt", lrate = 0.8, tauLearn = 100000, tauTop = 100000 , toprate = 10)
-som.train_network(1500)
+som = SOM(txtfile = "8.txt", lrate = 0.5, tauLearn = 100000, tauTop = 10000 , toprate = 20)
+som.train_network(400)
 a = input()
+
 #som.plotProgression()
 
 
