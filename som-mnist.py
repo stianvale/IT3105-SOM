@@ -200,13 +200,14 @@ class SOM(object):
 			5: 'purple', 6: 'green', 7: 'black', 8: 'brown', 9: 'cyan', 10: 'grey'
 		}
 
-		values = [val_map[x] for x in self.classes]
+		colors = [val_map[x] for x in self.classes]
 
-		nx.draw_networkx(G, pos=pos, node_color = values, with_labels = False)
+		values = dict((n,v) for n, v in list(zip(G.nodes(),self.classes)))
+
+		nx.draw_networkx(G, pos=pos, node_color = colors, labels = values)
 
 		plt.axis('off')
 		plt.show()
-
 
 
 

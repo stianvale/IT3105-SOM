@@ -3,7 +3,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import random
 
-list = 	[4, 7, 9, 9, 4, 7, 2, 5, 3, 2, 4, 9, 8, 2, 10, 3, 10, 3, 3, 3, 10, 10, 10, 0, 10, 3, 6, 10, 10, 2, 5, 1, 1, 2, 8, 3, 1, 5, 10, 2, 8, 3, 10, 5, 6, 3, 1, 2, 10, 10, 8, 3, 2, 2, 6, 3, 9, 10, 10, 5, 2, 2, 2, 2, 10, 10, 10, 8, 10, 5, 5, 2, 2, 8, 10, 10, 5, 8, 2, 7, 10, 2, 6, 4, 7, 8, 0, 8, 9, 7, 6, 0, 0, 0, 7, 9, 5, 5, 1, 2]
+liste = 	[4, 7, 9, 9, 4, 7, 2, 5, 3, 2, 4, 9, 8, 2, 10, 3, 10, 3, 3, 3, 10, 10, 10, 0, 10, 3, 6, 10, 10, 2, 5, 1, 1, 2, 8, 3, 1, 5, 10, 2, 8, 3, 10, 5, 6, 3, 1, 2, 10, 10, 8, 3, 2, 2, 6, 3, 9, 10, 10, 5, 2, 2, 2, 2, 10, 10, 10, 8, 10, 5, 5, 2, 2, 8, 10, 10, 5, 8, 2, 7, 10, 2, 6, 4, 7, 8, 0, 8, 9, 7, 6, 0, 0, 0, 7, 9, 5, 5, 1, 2]
 
 
 N = 10
@@ -11,8 +11,7 @@ G=nx.grid_2d_graph(N,N)
 pos = dict( (n, (n[1], N-1-n[0])) for n in G.nodes() )
 
 
-print(G.nodes())
-print(pos)
+
 
 val_map = {
 	0: 'red',
@@ -29,10 +28,19 @@ val_map = {
 }
 
 
-values = [val_map[x] for x in list]
+colors = [val_map[x] for x in liste]
+
+values = dict((n,v) for n, v in list(zip(G.nodes(),liste)))
+print(values)
 
 
-nx.draw_networkx(G, pos=pos, node_color = values, with_labels = False)
+nx.draw_networkx(G, pos=pos, node_color = colors, labels = values)
+#print(G.nodes())
+
+labels = dict( ((i, j), i + (N-1-j) * N ) for i, j in G.nodes() ) 
+#print("Here comes labels")
+#print(labels)
+#print(pos)
 
 plt.axis('off')
 plt.show()
