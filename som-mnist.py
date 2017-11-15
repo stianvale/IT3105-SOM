@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import time
 import networkx as nx
 import matplotlib.pyplot as plt
+import cProfile
 
 class SOM(object):
 
@@ -144,15 +145,14 @@ class SOM(object):
 
 		print("Correct: " + str(correct*100/len(self.inputs)) + "%")
 
-		testlist = []
+		'''testlist = []
 
 		for i in range(0,100):
 			if (i % 10 == 0):
 				testlist.append([])
 			testlist[-1].append(self.classes[i])
 
-		print(np.array(testlist))
-
+		print(np.array(testlist))'''
 
 
 		return correct
@@ -196,8 +196,8 @@ class SOM(object):
 		pos = dict( (n, (n[1], N-1-n[0])) for n in G.nodes() )
 
 		val_map = {
-			0: 'red', 1: 'orange', 2: 'blue', 3: 'crimson', 4: 'pink',
-			5: 'purple', 6: 'green', 7: 'black', 8: 'brown', 9: 'cyan', 10: 'grey'
+			0: 'khaki', 1: 'orange', 2: 'cornflowerblue', 3: 'red', 4: 'tomato',
+			5: 'purple', 6: 'gold', 7: 'lime', 8: 'brown', 9: 'cyan', 10: 'grey'
 		}
 
 		colors = [val_map[x] for x in self.classes]
@@ -211,14 +211,15 @@ class SOM(object):
 
 
 
+def main():
+	som = SOM(txtfile = "mnist.txt", lrate = 0.3, tauLearn = 2000, tauTop = 500 , toprate = 10)
+	som.train_network(100)
+
+	a = input()
 
 
-som = SOM(txtfile = "mnist.txt", lrate = 0.3, tauLearn = 2000, tauTop = 500 , toprate = 10)
-som.train_network(500)
 
-a = input()
-#som.plotProgression()
-
+cProfile.run('main()')
 
 
 
