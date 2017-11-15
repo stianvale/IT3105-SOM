@@ -58,7 +58,7 @@ class SOM(object):
 
 	def getTopDist(self, i, j):
 
-		topDist = math.fabs((i % 10) - (j % 10)) + math.fabs((math.floor(i/10)) - math.floor(j/10))
+		topDist = math.fabs((i % self.gridSize) - (j % self.gridSize)) + math.fabs((math.floor(i/self.gridSize)) - math.floor(j/self.gridSize))
 
 		return topDist
 
