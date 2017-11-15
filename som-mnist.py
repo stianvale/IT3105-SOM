@@ -66,7 +66,7 @@ class SOM(object):
 		#self.plotResults()
 		for epoch in range(epochs):
 			print(epoch)
-			if((epoch+1) % 50 == 0):
+			if((epoch+1) % 100 == 0):
 				#self.plotMap(epoch)
 				self.test_network()
 				self.plotGrid()
@@ -244,7 +244,7 @@ class SOM(object):
 
 
 def main():
-	som = SOM(txtfile = "mnist.txt", gridSize = 10, lrate = 0.5, tauLearn = 2000, tauTop = 500 , toprate = 10)
+	som = SOM(txtfile = "mnist.txt", gridSize = 12, lrate = 0.5, tauLearn = 20000, tauTop = 500 , toprate = 10)
 	som.train_network(200)
 
 	a = input()
