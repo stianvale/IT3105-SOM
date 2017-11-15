@@ -12,7 +12,9 @@ class SOM(object):
 		
 
 		self.targets = []
-		self.inputs = np.array(self.import_from_file(txtfile))
+		self.rand = None
+		self.testset = None
+		self.import_from_file(txtfile)
 		self.outputs = None
 		self.numCities = None
 		self.lrate = lrate
@@ -42,7 +44,10 @@ class SOM(object):
 				coords.append([int(x) for x in line_split[:-1]])
 				self.targets.append(int(line_split[-1]))
 
-		return coords[0:500]
+		self.rand = random.randint(0,len(coords)-601)
+
+		self.inputs = np.array(coords[self.rand:self.rand + 500])
+		self.testset = np.array(coords[self.rand + 500:self.rand + 600])
 
 	def createOutputLayer(self):
 
@@ -59,7 +64,7 @@ class SOM(object):
 		#self.plotResults()
 		for epoch in range(epochs):
 			print(epoch)
-			if((epoch+1) % 10 == 0):
+			if((epoch+1) % 50 == 0):
 				#self.plotMap(epoch)
 				self.test_network()
 				self.plotGrid()
@@ -78,22 +83,21 @@ class SOM(object):
 				# 		winning_distance = distance
 				# 		winning_node = j
 
-				distances = np.array([np.linalg.norm(inpt - outpt) for outpt in self.outputs])
+				distances = np.linalg.norm(inpt - self.outputs, axis=1)
 				winning_node = np.argmin(distances)
 
-				# top_dists = np.array([self.getTopDist(winning_node, x) for x in range(len(self.outputs))])
-				# top_vals = np.array([math.exp(-((top_dist)**2)/self.toprate**2) for top_dist in top_dists])
-				# vector_diffs = np.array([inpt - outpt for outpt in self.outputs])
-				# self.outputs = np.array([self.outputs[j] + self.lrate * top_vals[j] * vector_diffs[j] for j in range(len(self.outputs))])
-				for j, outpt in enumerate(self.outputs):
-					top_dist = self.getTopDist(winning_node,j)
+				top_dists = np.array([self.getTopDist(winning_node, x) for x in range(len(self.outputs))])
+				top_vals = np.exp([-((top_dists)**2)/self.toprate**2])
+
+				self.outputs = self.outputs + self.lrate * np.transpose(top_vals) * (inpt - self.outputs) 
+
+				#self.outputs = np.array([self.outputs[j] + self.lrate * top_vals[j] * vector_diffs[j] for j in range(len(self.outputs))])
+				# for j, outpt in enumerate(self.outputs):
+				# 	top_dist = self.getTopDist(winning_node,j)
 					
-					top_val = math.exp(-((top_dist)**2)/self.toprate**2)
+				# 	top_val = math.exp(-((top_dist)**2)/self.toprate**2)
 
-					self.outputs[j] = outpt + self.lrate * top_val * (inpt - outpt)
-
-					outpt[0] = outpt[0] + self.lrate * top_val * (inpt[0] - outpt[0])
-					outpt[1] = outpt[1] + self.lrate * top_val * (inpt[1] - outpt[1])
+				# 	self.outputs[j] = outpt + self.lrate * top_val * (inpt - outpt)
 
 			self.toprate = self.toprate * math.exp(-epoch/self.tauTop)
 			self.lrate = self.lrate * math.exp(-epoch/self.tauLearn)
@@ -117,12 +121,12 @@ class SOM(object):
 					winning_distance = distance
 					winning_node = j
 
-			self.winners[winning_node].append(self.targets[i])
+			self.winners[winning_node].append(self.targets[self.rand + i])
 
 		for i in range(len(self.classes)):
 			bincount = np.bincount(self.winners[i])
 			if (len(bincount) == 0):
-				self.classes[i] = 10
+				self.classes[i] = -1
 			else:
 				self.classes[i] = np.argmax(bincount)
 
@@ -143,10 +147,29 @@ class SOM(object):
 					winning_distance = distance
 					winning_node = j
 
-			if(self.classes[winning_node] == self.targets[i]):
+			if(self.classes[winning_node] == self.targets[self.rand + i]):
 				correct += 1
 
-		print("Correct: " + str(correct*100/len(self.inputs)) + "%")
+		print("Training correct: " + str(correct*100/len(self.inputs)) + "%")
+
+		correct = 0
+		for i, inpt in enumerate(self.testset):
+			winning_node = None
+			winning_distance = None
+			for j, outpt in enumerate(self.outputs):
+				if(j == 0):
+					winning_node = 0
+					winning_distance = np.linalg.norm(inpt - outpt)
+
+				distance = np.linalg.norm(inpt - outpt)
+				if(distance < winning_distance):
+					winning_distance = distance
+					winning_node = j
+
+			if(self.classes[winning_node] == self.targets[self.rand + 500 + i]):
+				correct += 1
+
+		print("Testing correct: " + str(correct*100/len(self.testset)) + "%")
 
 		testlist = []
 
@@ -200,7 +223,7 @@ class SOM(object):
 
 		val_map = {
 			0: 'red', 1: 'orange', 2: 'blue', 3: 'crimson', 4: 'pink',
-			5: 'purple', 6: 'green', 7: 'grey', 8: 'brown', 9: 'cyan', 10: 'black'
+			5: 'purple', 6: 'green', 7: 'grey', 8: 'brown', 9: 'cyan', -1: 'black'
 		}
 
 		colors = [val_map[x] for x in self.classes]
@@ -210,13 +233,15 @@ class SOM(object):
 		nx.draw_networkx(G, pos=pos, node_color = colors, labels = values)
 
 		plt.axis('off')
+		plt.ion()
 		plt.show()
+		a = input()
 
 
 
 
 
-som = SOM(txtfile = "mnist.txt", lrate = 0.7, tauLearn = 2000, tauTop = 500 , toprate = 5)
+som = SOM(txtfile = "mnist.txt", lrate = 0.7, tauLearn = 2000, tauTop = 500 , toprate = 20)
 som.train_network(500)
 
 a = input()
