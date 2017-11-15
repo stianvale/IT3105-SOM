@@ -9,7 +9,7 @@ import cProfile
 
 class SOM(object):
 
-	def __init__(self, txtfile, lrate, tauLearn, tauTop, toprate):
+	def __init__(self, txtfile, gridSize, lrate, tauLearn, tauTop, toprate):
 		
 
 		self.targets = []
@@ -26,6 +26,7 @@ class SOM(object):
 		self.maxX = None
 		self.minY = None
 		self.maxY = None
+		self.gridSize = gridSize
 
 		self.createOutputLayer()
 		self.outputsPlots = [self.outputs[:]]
@@ -52,7 +53,7 @@ class SOM(object):
 
 	def createOutputLayer(self):
 
-		self.outputs = np.array([[random.uniform(0,1) for x in self.inputs[0]] for x in range(0,100)])
+		self.outputs = np.array([[random.uniform(0,1) for x in self.inputs[0]] for x in range(0,self.gridSize**2)])
 
 
 	def getTopDist(self, i, j):
@@ -85,6 +86,7 @@ class SOM(object):
 				# 		winning_node = j
 
 				distances = np.linalg.norm(inpt - self.outputs, axis=1)
+
 				winning_node = np.argmin(distances)
 
 				top_dists = np.array([self.getTopDist(winning_node, x) for x in range(len(self.outputs))])
@@ -102,6 +104,7 @@ class SOM(object):
 
 			self.toprate = self.toprate * math.exp(-epoch/self.tauTop)
 			self.lrate = self.lrate * math.exp(-epoch/self.tauLearn)
+
 
 		#print(self.inputs)
 		#print(self.outputs)
@@ -179,11 +182,7 @@ class SOM(object):
 				testlist.append([])
 			testlist[-1].append(self.classes[i])
 
-<<<<<<< HEAD
 		print(np.array(testlist))'''
-=======
-
->>>>>>> 236a1ff43833ed0bb8ca9fc132d72f7fcfdacbca
 
 
 		return correct
@@ -222,15 +221,16 @@ class SOM(object):
 		return length
 
 	def plotGrid(self):
-		N = 10
-		G=nx.grid_2d_graph(N,N)
-		pos = dict( (n, (n[1], N-1-n[0])) for n in G.nodes() )
+		plt.clf()
+		G=nx.grid_2d_graph(self.gridSize,self.gridSize)
+		pos = dict( (n, (n[1], self.gridSize-1-n[0])) for n in G.nodes() )
 
 		val_map = {
 			0: 'khaki', 1: 'orange', 2: 'cornflowerblue', 3: 'red', 4: 'tomato',
-			5: 'purple', 6: 'gold', 7: 'lime', 8: 'brown', 9: 'cyan', 10: 'grey'
+			5: 'purple', 6: 'gold', 7: 'lime', 8: 'brown', 9: 'cyan', -1: 'grey'
 		}
 
+		
 		colors = [val_map[x] for x in self.classes]
 
 		values = dict((n,v) for n, v in list(zip(G.nodes(),self.classes)))
@@ -243,16 +243,14 @@ class SOM(object):
 		a = input()
 
 
-
 def main():
-	som = SOM(txtfile = "mnist.txt", lrate = 0.3, tauLearn = 2000, tauTop = 500 , toprate = 10)
-	som.train_network(100)
+	som = SOM(txtfile = "mnist.txt", gridSize = 10, lrate = 0.5, tauLearn = 2000, tauTop = 500 , toprate = 10)
+	som.train_network(200)
 
 	a = input()
 
 
-
-cProfile.run('main()')
+main()
 
 
 
