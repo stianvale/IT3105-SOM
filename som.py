@@ -20,6 +20,25 @@ class SOM(object):
 		self.maxX = None
 		self.minY = None
 		self.maxY = None
+		self.opt = None
+
+
+		if(txtfile[0] == "1"):
+			self.opt = 7542
+		elif(txtfile[0] == "2"):
+			self.opt = 6110
+		elif(txtfile[0] == "3"):
+			self.opt = 629
+		elif(txtfile[0] == "4"):
+			self.opt = 22068
+		elif(txtfile[0] == "5"):
+			self.opt = 14379
+		elif(txtfile[0] == "6"):
+			self.opt = 108159
+		elif(txtfile[0] == "7"):
+			self.opt = 59030
+		elif(txtfile[0] == "8"):
+			self.opt = 1211
 
 		self.createOutputLayer()
 		print(self.outputs)
@@ -67,7 +86,9 @@ class SOM(object):
 	def train_network(self, epochs):
 		#self.plotResults()
 		for epoch in range(epochs):
-			#print(epoch)
+			print(epoch)
+			print("Learning rate: " + str(self.lrate))
+			print("Neighbourhood size: " + str(self.toprate))
 			if((epoch) % 100 == 0):
 				self.plotMap(epoch)
 
@@ -96,6 +117,15 @@ class SOM(object):
 
 			self.toprate = self.toprate * math.exp(-epoch/self.tauTop)
 			self.lrate = self.lrate * math.exp(-epoch/self.tauLearn)
+
+		print("Final length: " + str(self.return_ring_length()))
+
+		if(self.opt != None):
+			print("Optimal path has length: " + str(self.opt))
+			if(self.return_ring_length() <= 1.1 * self.opt):
+				print("Congratulations! Final length within 10 per cent of optimal.")
+			else:
+				print("Not good enough length. Try again!")
 
 		#print(self.inputs)
 		#print(self.outputs)
@@ -133,7 +163,7 @@ class SOM(object):
 
 				
 
-som = SOM(txtfile = "8.txt", lrate = 0.5, tauLearn = 100000, tauTop = 10000 , toprate = 20)
+som = SOM(txtfile = "1.txt", lrate = 0.5, tauLearn = 100000, tauTop = 10000 , toprate = 20)
 som.train_network(400)
 a = input()
 
