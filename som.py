@@ -7,11 +7,12 @@ import time
 
 class SOM(object):
 
-	def __init__(self, txtfile, lrate, tauLearn, tauTop, toprate):
+	def __init__(self, txtfile, neurons, lrate, tauLearn, tauTop, toprate):
 		
 		self.inputs = self.import_from_file(txtfile)
 		self.outputs = None
 		self.numCities = None
+		self.neurons = neurons
 		self.lrate = lrate
 		self.tauLearn = tauLearn
 		self.toprate = toprate
@@ -21,6 +22,8 @@ class SOM(object):
 		self.minY = None
 		self.maxY = None
 		self.opt = None
+		self.learningRates = [lrate]
+		self.neighbourhoodSizes = [toprate]
 
 
 		if(txtfile[0] == "1"):
@@ -41,9 +44,9 @@ class SOM(object):
 			self.opt = 1211
 
 		self.createOutputLayer()
-		print(self.outputs)
+		#print(self.outputs)
 		self.outputsPlots = [self.outputs[:]]
-		print(self.outputsPlots)
+		#print(self.outputsPlots)
 	
 
 	def import_from_file(self, txtfile):
@@ -63,7 +66,7 @@ class SOM(object):
 				line_split = [x for x in line_split if x != ""]
 				if(len(line_split) == 1):
 					break
-				print(line_split)
+				#print(line_split)
 				coords.append([float(x) for x in line_split[1:]])
 
 		return coords
@@ -80,13 +83,15 @@ class SOM(object):
 
 		self.numCities = len(self.inputs)
 
-		self.outputs = [[random.uniform(self.minX,self.maxX), random.uniform(self.minY, self.maxY)] for x in range(0,300)]
+		self.outputs = [[random.uniform(self.minX,self.maxX), random.uniform(self.minY, self.maxY)] for x in range(0, self.neurons)]
 
 
 	def train_network(self, epochs):
 		#self.plotResults()
-		for epoch in range(epochs):
+		for epoch in range(epochs+1):
 			print(epoch)
+			self.learningRates.append(self.lrate)
+			self.neighbourhoodSizes.append(self.toprate)
 			print("Learning rate: " + str(self.lrate))
 			print("Neighbourhood size: " + str(self.toprate))
 			if((epoch) % 100 == 0):
@@ -127,6 +132,9 @@ class SOM(object):
 			else:
 				print("Not good enough length. Try again!")
 
+		self.plotLearningRates()
+		self.plotNeighbourhoodSizes()
+
 		#print(self.inputs)
 		#print(self.outputs)
 
@@ -137,6 +145,7 @@ class SOM(object):
 
 
 	def plotMap(self,epoch):
+		plt.figure(1)
 		plt.clf()
 		p1 = plt.plot([x[0] for x in self.outputs] + [self.outputs[0][0]], [x[1] for x in self.outputs] + [self.outputs[0][1]], '--bo')
 		p2 = plt.plot([x[0] for x in self.inputs], [x[1] for x in self.inputs], 'rx')
@@ -160,12 +169,26 @@ class SOM(object):
 
 		return length
 
+	def plotLearningRates(self):
+		plt.figure(2)
+		plt.clf()
+		plt.plot(self.learningRates)
+		plt.title("Development of Learning Rate. \n From %f to %f" %(self.learningRates[0], self.learningRates[-1]))
+		plt.draw()
 
-				
+	def plotNeighbourhoodSizes(self):
+		plt.figure(3)
+		plt.clf()
+		plt.plot(self.neighbourhoodSizes)
+		plt.title("Development of Neigbourhood Size. \n From %f to %f" %(self.neighbourhoodSizes[0], self.neighbourhoodSizes[-1]))
+		plt.show()
 
-som = SOM(txtfile = "1.txt", lrate = 0.5, tauLearn = 100000, tauTop = 10000 , toprate = 20)
-som.train_network(400)
-a = input()
+
+def main(fileNumber):	
+	txtFile = fileNumber+'.txt'
+	som = SOM(txtfile = txtFile, neurons = 300, lrate = 0.5, tauLearn = 100000, tauTop = 10000 , toprate = 20)
+	som.train_network(400)
+	a = input()
 
 #som.plotProgression()
 
