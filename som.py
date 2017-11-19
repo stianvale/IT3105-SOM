@@ -7,9 +7,10 @@ import time
 
 class SOM(object):
 
-	def __init__(self, txtfile, neurons, lrate, tauLearn, tauTop, toprate):
+	def __init__(self, txtfile, neurons, lrate, tauLearn, tauTop, toprate, plotRate):
 		
 		self.inputs = self.import_from_file(txtfile)
+		self.plotRate = plotRate
 		self.outputs = None
 		self.numCities = None
 		self.neurons = neurons
@@ -94,7 +95,7 @@ class SOM(object):
 			self.neighbourhoodSizes.append(self.toprate)
 			print("Learning rate: " + str(self.lrate))
 			print("Neighbourhood size: " + str(self.toprate))
-			if((epoch) % 100 == 0):
+			if((epoch) % self.plotRate == 0):
 				self.plotMap(epoch)
 
 			for i, inpt in enumerate(self.inputs):
@@ -135,8 +136,6 @@ class SOM(object):
 		self.plotLearningRates()
 		self.plotNeighbourhoodSizes()
 
-		#print(self.inputs)
-		#print(self.outputs)
 
 	def plotResults(self):
 		p1 = plt.plot([x[0] for x in self.outputs] + [self.outputs[0][0]], [x[1] for x in self.outputs] + [self.outputs[0][1]], '--bo')
@@ -184,13 +183,24 @@ class SOM(object):
 		plt.show()
 
 
-def main(fileNumber):	
+def main(fileNumber):
+	fileNumber = str(fileNumber)
 	txtFile = fileNumber+'.txt'
-	som = SOM(txtfile = txtFile, neurons = 300, lrate = 0.5, tauLearn = 100000, tauTop = 10000 , toprate = 20)
+	toprate = 100
+
+	if(fileNumber == str(1)):
+		toprate = 40
+	elif(fileNumber == str(7)):
+		toprate = 30
+	elif(fileNumber == str(8)):
+		toprate = 50
+	som = SOM(txtfile = txtFile, neurons = 300, lrate = 0.5, tauLearn = 100000, tauTop = 10000 , toprate = toprate, plotRate = 100)
 	som.train_network(400)
 	a = input()
 
 #som.plotProgression()
+
+
 
 
 

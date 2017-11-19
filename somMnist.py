@@ -9,9 +9,10 @@ import cProfile
 
 class SOM(object):
 
-	def __init__(self, txtfile, gridSize, lrate, tauLearn, tauTop, toprate):
+	def __init__(self, txtfile, gridSize, lrate, tauLearn, tauTop, toprate, trainSize, testSize, plotRate):
 		
-
+		self.trainSize = trainSize
+		self.testSize = testSize
 		self.targets = []
 		self.rand = None
 		self.testset = None
@@ -27,6 +28,7 @@ class SOM(object):
 		self.minY = None
 		self.maxY = None
 		self.gridSize = gridSize
+		self.plotRate = plotRate
 
 		self.createOutputLayer()
 		self.outputsPlots = [self.outputs[:]]
@@ -46,10 +48,10 @@ class SOM(object):
 				coords.append([int(x) for x in line_split[:-1]])
 				self.targets.append(int(line_split[-1]))
 
-		self.rand = random.randint(0,len(coords)-601)
+		self.rand = random.randint(0,len(coords)-1-self.trainSize-self.testSize)
 
-		self.inputs = np.array(coords[self.rand:self.rand + 500])
-		self.testset = np.array(coords[self.rand + 500:self.rand + 600])
+		self.inputs = np.array(coords[self.rand:self.rand + self.trainSize])
+		self.testset = np.array(coords[self.rand + self.trainSize:self.rand + self.trainSize + self.testSize])
 
 	def createOutputLayer(self):
 
@@ -66,24 +68,15 @@ class SOM(object):
 		#self.plotResults()
 		for epoch in range(epochs):
 			print(epoch)
-			if((epoch+1) % 100 == 0):
+			if((epoch+1) % self.plotRate == 0):
 				#self.plotMap(epoch)
+				print("Learning rate: " + str(self.lrate))
+				print("Neighbourhood size: " + str(self.toprate))
 				self.test_network()
 				self.plotGrid()
 
 
 			for i, inpt in enumerate(self.inputs):
-				# winning_node = None
-				# winning_distance = None
-				# for j, outpt in enumerate(self.outputs):
-				# 	if(j == 0):
-				# 		winning_node = 0
-				# 		winning_distance = np.linalg.norm(inpt - outpt)
-
-				# 	distance = np.linalg.norm(inpt - outpt)
-				# 	if(distance < winning_distance):
-				# 		winning_distance = distance
-				# 		winning_node = j
 
 				distances = np.linalg.norm(inpt - self.outputs, axis=1)
 
@@ -94,20 +87,9 @@ class SOM(object):
 
 				self.outputs = self.outputs + self.lrate * np.transpose(top_vals) * (inpt - self.outputs) 
 
-				#self.outputs = np.array([self.outputs[j] + self.lrate * top_vals[j] * vector_diffs[j] for j in range(len(self.outputs))])
-				# for j, outpt in enumerate(self.outputs):
-				# 	top_dist = self.getTopDist(winning_node,j)
-					
-				# 	top_val = math.exp(-((top_dist)**2)/self.toprate**2)
-
-				# 	self.outputs[j] = outpt + self.lrate * top_val * (inpt - outpt)
-
 			self.toprate = self.toprate * math.exp(-epoch/self.tauTop)
 			self.lrate = self.lrate * math.exp(-epoch/self.tauLearn)
 
-
-		#print(self.inputs)
-		#print(self.outputs)
 
 	def classify(self):
 		self.classes = [0 for x in self.outputs]
@@ -241,17 +223,15 @@ class SOM(object):
 		plt.axis('off')
 		plt.ion()
 		plt.show()
-		a = input()
 
 
 def main():
-	som = SOM(txtfile = "mnist.txt", gridSize = 12, lrate = 0.5, tauLearn = 20000, tauTop = 500 , toprate = 10)
+	som = SOM(txtfile = "mnist.txt", gridSize = 12, lrate = 0.5, tauLearn = 20000, tauTop = 500 , toprate = 10, trainSize = 500, testSize = 100, plotRate = 50)
 	som.train_network(100)
 
 	a = input()
 
 
-#main()
 
 
 
